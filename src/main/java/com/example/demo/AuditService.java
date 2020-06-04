@@ -3,7 +3,6 @@ package com.example.demo;
 import com.example.demo.entity.Audit;
 import com.example.demo.repository.AuditRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ public class AuditService {
         this.auditRepository = auditRepository;
     }
 
-    public Audit save(UUID uuid, String requestURI, String method, Object payload, int status) {
+    private Audit save(UUID uuid, String requestURI, String method, Object payload, int status) {
         Audit audit = new Audit();
         audit.setId(uuid);
         audit.setPayload(payload);
@@ -46,17 +45,15 @@ public class AuditService {
         }
     }
 
-    public void auditRequest(UUID uuid, HttpServletRequest request) {
-        Object payload = getPayload(request);
-        save(uuid, request.getRequestURI(), request.getMethod(), payload, 0);
-    }
-
     public void auditResponse(UUID uuid, HttpServletResponse response, Object responseBody) {
-        System.out.println(responseBody);
+        System.out.println("Response " + uuid);
         update(uuid, response.getStatus());
     }
 
-    private Object getPayload(HttpServletRequest request) {
-        return request.getParameterMap();
+    public void auditRequest(HttpServletRequest httpServletRequest, Object requestBody) {
+        UUID uuid = UUID.randomUUID();
+        httpServletRequest.setAttribute("uuid", uuid);
+        System.out.println("Request " + uuid);
+        save(uuid, httpServletRequest.getRequestURI(), httpServletRequest.getMethod(), requestBody, 0);
     }
 }

@@ -36,18 +36,17 @@ public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
 
         if (serverHttpRequest instanceof ServletServerHttpRequest &&
                 serverHttpResponse instanceof ServletServerHttpResponse) {
-            auditRequestResponse(o, (ServletServerHttpRequest) serverHttpRequest, (ServletServerHttpResponse) serverHttpResponse);
+            auditResponse(o, (ServletServerHttpRequest) serverHttpRequest, (ServletServerHttpResponse) serverHttpResponse);
         }
 
         return o;
     }
 
-    private void auditRequestResponse(Object responseBody,
-                                      ServletServerHttpRequest serverHttpRequest,
-                                      ServletServerHttpResponse serverHttpResponse) {
+    private void auditResponse(Object responseBody,
+                               ServletServerHttpRequest serverHttpRequest,
+                               ServletServerHttpResponse serverHttpResponse) {
 
-        UUID uuid = UUID.randomUUID();
-        //auditService.auditRequest(uuid, serverHttpRequest.getServletRequest());
+        UUID uuid = UUID.fromString(serverHttpRequest.getServletRequest().getAttribute("uuid").toString());
         auditService.auditResponse(uuid, serverHttpResponse.getServletResponse(), responseBody);
     }
 
